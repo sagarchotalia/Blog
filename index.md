@@ -1,10 +1,8 @@
-# Hello World
-## Hello world using jekyll
+# Chapter 0
+Pre-GSoC Phase
 
-`this is code fencing`
+# Chapter 1
+Community Bonding Period
 
-*Text in Italic*
-
-**Text in Bold**
-
-Normal Text
+# Chapter 2
+Coding Begins!
