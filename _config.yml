@@ -1,4 +1,15 @@
+# Site
 theme: jekyll-theme-hacker
 title: GSoC 2022 Blog
 url: index.md
 description: This is my blog for Google Summer of Code, 2022 under the organisation OpenAstronomy.
+# Personal Info
+name: Sagar Chotalia
+email: sagarchotalia2@gmail.com
+# Social Links
+github_username: sagarchotalia
+instagram_username: sagarchotalia
+linkedin_username: sagar-chotalia
+# About Section
+about_title: About Me
+about_profile_image:
