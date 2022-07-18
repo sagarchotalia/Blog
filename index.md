@@ -30,4 +30,28 @@ Dr. Erwan let us know about the community's plan to conduct our projects in team
 
 Thus a team between [Arunava Basu](https://github.com/arunavabasu-03) and I, and a team between [Tran Huu Nhat Huy](https://github.com/TranHuuNhatHuy) and [Supriya Kumari](https://github.com/Supriya1702) was formed.
 
-Unfortunately, I fell sick midway through week 1. :( I tried to tackle smaller issues, but couldn't focus at all. So, I cut myself some slack and took rest. Week 2 was similar, I couldn't get much stuff done. However, I put all my energy into getting better and also tried deepening my understanding of the RADIS code. Small challenges like resolving database path errors in ~/radis.json felt like huge wins!
+Unfortunately, I fell sick midway through week 1. I tried to tackle smaller issues, but couldn't focus at all. 
+So, I cut myself some slack and took rest. Week 2 was similar, I couldn't get much stuff done. However, I put all my energy into getting better and also tried deepening my understanding of the RADIS code. Small challenges like resolving database path errors in ~/radis.json felt like huge wins!
+
+Slowly but steadily, I began to solve the chunksize issue that was assigned to me. I looked at the various functions in broadening.py, and how they interact with each other. It was super interesting to see how all the functions were so useful, and how the computation of one parameter given certain constraints, utilized many of the functions.
+
+# Chapter 3: Weeks 3 and 4
+
+In week 3, I began testing my implementation of the chunksize feature. I found that there was an error being raised in the plotting of graphs, due to a library called *publib* being used. Upon searching for this library, I was amazed to see that it was built by Dr. Erwan! You can have a look at it [here](https://github.com/erwanp/publib)
+
+I initially thought nothing of the error, and was convinced that my implementation was correct. Dr Erwan then guided me to [an example](https://radis.readthedocs.io/en/latest/auto_examples/plot_styles.html#sphx-glr-auto-examples-plot-styles-py) in the RADIS Example Gallery, in which you can change the library being used. Hence, I dropped publib and just used the default config used in the example, which used Seaborn. I found it worked for me, hence I continued with it.
+
+I ran the chunksize code again, and found out that I was getting some errors regarding array sizes not being equal, during the initialization of a DataFrame in the code. Since Pandas DataFrames require all rows to be equal in size, this was an unavoidable error. I began debugging the error.
+
+It turned out that, when the chunksize loop was running in the code, and optimization was set as a parameter, certain values were being calculated incorrectly. Let me walk you through the broadening calculations of RADIS:
+
+- When we want to calculate the broadening without chunksize, i.e. over the entire DataFrame, we set parameters like `line_profile`, `wavenumber`, `abscoeff`, and certain other parameters such as `line_profile_LDM, wL, wG, wL_dat, wG_dat` which are important to the internal computations of RADIS.
+- The wL, wG, wG_dat and wL_dat parameters then set a few more values that are used in the function `_apply_lineshape_LDM()`, which is the final step in the broadening process.
+- Usually, when we calculate all these constants over the entire DataFrame, they can be arrays with large lengths. Hence while computing them over chunks of the DataFrame, these individually calculated arrays need to be appended to the initialised constants. This was the step I was doing wrong, which I then fixed.
+
+I found that after this correction, the errors I had encountered while plotting the graphs were gone. However, just as soon as one error was resolved, another one occurred :')
+The example that I was testing my code in wasn't even entering the Chunksize loop. I took a long look at the code, and added chunksize as parameters in two very important functions: [calc_spectrum()](https://github.com/radis/radis/blob/b853a26b34a0b9b53670062a2214da4d134ec391/radis/lbl/calc.py#L38) and [calc_spectrum_one_molecule()](https://github.com/radis/radis/blob/b853a26b34a0b9b53670062a2214da4d134ec391/radis/lbl/calc.py#L568). These are the two main functions invoked whenever we want to calculate a spectrum with RADIS, given the input parameters such as the temperature, pressure, type of molecule, database to refer etc. I then improved the code a bit, fixed the mistakes I had made during my initial implementation, and voila! The example was atleast entering the right part of the code. This didn't solve all my issues though.
+
+![image](/Users/sagarchotalia/Blog/Assets/image.png)
+
+This was the output when I ran the code with the exact same conditions, apart from the chunksize parameter, which you can observe was set to 300 for the black coloured lines and `None` for the red one. The output should've been the exact same, but it wasn't. And so, I got to debugging the error.
